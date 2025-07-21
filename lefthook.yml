@@ -1,0 +1,5 @@
+pre-commit:
+  commands:
+    extract-solutions:
+      run: ./scripts/extract-solutions.ts
+      stage_fixed: true

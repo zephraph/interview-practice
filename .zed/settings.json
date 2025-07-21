@@ -1,0 +1,27 @@
+{
+  "lsp": {
+    "deno": {
+      "settings": {
+        "deno": {
+          "enable": true,
+          "lint": true,
+          "unstable": false,
+          "suggest": {
+            "completeFunctionCalls": true,
+            "names": true,
+            "paths": true,
+            "autoImports": true
+          }
+        }
+      }
+    }
+  },
+  "languages": {
+    "TypeScript": {
+      "language_servers": ["deno", "!typescript-language-server"]
+    },
+    "JavaScript": {
+      "language_servers": ["deno", "!typescript-language-server"]
+    }
+  }
+}

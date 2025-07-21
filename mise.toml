@@ -1,0 +1,12 @@
+[tools]
+deno = "2.4.2"
+lefthook = "1.12.2"
+
+[hooks]
+postinstall = ["deno install", "lefthook install"]
+
+[tasks]
+test = "deno test"
+"test:watch" = "deno test --watch"
+grade = "deno run --allow-run --allow-read --allow-write scripts/analyze-problems.ts"
+check = "deno test problems/**"
