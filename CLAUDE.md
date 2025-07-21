@@ -34,3 +34,7 @@ deno test problems/
 2. Add an empty function wrapper for the problem
 3. Write comprehensive tests using `Deno.test`
 4. Keep everything in a single file
+
+## Problem Implementation Guidelines
+
+- All problems should start with a `throw new Error("Not implemented")` statement somewhere in it.

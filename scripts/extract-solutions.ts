@@ -34,27 +34,16 @@ async function saveSolutionCache(cache: SolutionCache): Promise<void> {
   await Deno.writeTextFile(SOLUTION_CACHE_FILE, JSON.stringify(cache, null, 2));
 }
 
-async function findSolvedProblems(): Promise<string[]> {
-  const solvedFiles: string[] = [];
+async function findProblemFiles(): Promise<string[]> {
+  const problemFiles: string[] = [];
   
   for await (const dirEntry of Deno.readDir("problems")) {
     if (dirEntry.isFile && dirEntry.name.endsWith(".ts")) {
-      const filePath = `problems/${dirEntry.name}`;
-      const content = await Deno.readTextFile(filePath);
-      
-      // Check if it has a problem function that doesn't contain "Not implemented"
-      const functionMatch = content.match(/function problem_\w+\([^)]*\):[^{]*\{([\s\S]*?)\}/);
-      if (functionMatch) {
-        const functionBody = functionMatch[1].trim();
-        // If the function body doesn't contain "Not implemented", it's considered solved
-        if (!functionBody.includes('throw new Error("Not implemented")')) {
-          solvedFiles.push(filePath);
-        }
-      }
+      problemFiles.push(`problems/${dirEntry.name}`);
     }
   }
   
-  return solvedFiles;
+  return problemFiles;
 }
 
 async function runTests(filePath: string): Promise<boolean> {
@@ -98,21 +87,11 @@ async function extractSolution(problemPath: string, cache: SolutionCache) {
     return cached.solutionPath;
   }
   
-  // Run tests first to see if the solution works
+  // Run tests to see if the solution works
   const testsPass = await runTests(problemPath);
   
   if (!testsPass) {
-    console.log(`Tests failed for ${problemPath}, resetting to throw only`);
-    await resetProblemToThrow(problemPath, content);
-    
-    // Stage the reset file
-    const gitAdd = new Deno.Command("git", {
-      args: ["add", problemPath],
-      stdout: "piped",
-      stderr: "piped",
-    });
-    await gitAdd.output();
-    console.log(`Staged reset file: ${problemPath}`);
+    console.log(`Tests failed for ${problemPath}, skipping`);
     return null;
   }
   
@@ -160,18 +139,24 @@ async function main() {
     }
     
     const cache = await loadSolutionCache();
-    const solvedProblems = await findSolvedProblems();
+    const problemFiles = await findProblemFiles();
     
-    if (solvedProblems.length === 0) {
-      console.log("No solved problems found.");
+    if (problemFiles.length === 0) {
+      console.log("No problem files found.");
       return;
     }
     
-    console.log(`Found ${solvedProblems.length} solved problem(s):`);
+    console.log(`Found ${problemFiles.length} problem file(s), checking for solutions...`);
     
-    for (const problemPath of solvedProblems) {
-      await extractSolution(problemPath, cache);
+    let extractedCount = 0;
+    for (const problemPath of problemFiles) {
+      const result = await extractSolution(problemPath, cache);
+      if (result) {
+        extractedCount++;
+      }
     }
+    
+    console.log(`\nExtracted ${extractedCount} solution(s).`);
     
     // Save cache after processing all problems
     await saveSolutionCache(cache);

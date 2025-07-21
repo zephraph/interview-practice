@@ -6,15 +6,8 @@ import { assertEquals } from "@std/assert";
  * You can return the answer in any order.
  */
 function problem_twoSum(nums: number[], target: number): number[] {
-  const indexMap = new Map<number, number>();
-  for (let i = 0; i < nums.length; ++i) {
-    const complement = target - nums[i];
-    if (indexMap.has(complement)) {
-      return [i, indexMap.get(complement)!];
-    }
-    indexMap.set(nums[i], i);
-  }
-  throw new Error("should have a solution");
+  // TODO: Implement this function
+  throw new Error("Not implemented");
 }
 
 Deno.test("twoSum - basic case", () => {

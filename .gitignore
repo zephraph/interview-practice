@@ -1,1 +1,3 @@
 .claude/*.local.json
+.solution-cache.json
+.analysis-cache.json
