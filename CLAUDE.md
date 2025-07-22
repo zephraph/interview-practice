@@ -38,3 +38,4 @@ deno test problems/
 ## Problem Implementation Guidelines
 
 - All problems should start with a `throw new Error("Not implemented")` statement somewhere in it.
+- Use Deno's assert library (`import { assert } from "@std/assert"`) for test assertions instead of `console.assert`.

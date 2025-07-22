@@ -1,3 +1,5 @@
+import { assert } from "@std/assert";
+
 /**
  * Implement a Token Bucket Rate Limiter
  * 
@@ -46,20 +48,20 @@ Deno.test("Token Bucket Rate Limiter - basic functionality", () => {
   
   // Initial burst - bucket starts full
   for (let i = 0; i < 10; i++) {
-    console.assert(limiter.allowRequest("user1", 0) === true);
+    assert(limiter.allowRequest("user1", 0) === true);
   }
-  console.assert(limiter.allowRequest("user1", 0) === false); // Bucket empty
+  assert(limiter.allowRequest("user1", 0) === false); // Bucket empty
   
   // After 1 second, 2 tokens refilled
-  console.assert(limiter.allowRequest("user1", 1000) === true);
-  console.assert(limiter.allowRequest("user1", 1000) === true);
-  console.assert(limiter.allowRequest("user1", 1000) === false);
+  assert(limiter.allowRequest("user1", 1000) === true);
+  assert(limiter.allowRequest("user1", 1000) === true);
+  assert(limiter.allowRequest("user1", 1000) === false);
   
   // After 5 more seconds, 10 tokens refilled (capped at capacity)
   for (let i = 0; i < 10; i++) {
-    console.assert(limiter.allowRequest("user1", 6000) === true);
+    assert(limiter.allowRequest("user1", 6000) === true);
   }
-  console.assert(limiter.allowRequest("user1", 6000) === false);
+  assert(limiter.allowRequest("user1", 6000) === false);
 });
 
 Deno.test("Token Bucket Rate Limiter - refill calculation", () => {
@@ -67,20 +69,20 @@ Deno.test("Token Bucket Rate Limiter - refill calculation", () => {
   
   // Use all tokens
   for (let i = 0; i < 5; i++) {
-    console.assert(limiter.allowRequest("user1", 0) === true);
+    assert(limiter.allowRequest("user1", 0) === true);
   }
   
   // Partial refill after 0.5 seconds (should have 0 tokens, not enough for a request)
-  console.assert(limiter.allowRequest("user1", 500) === false);
+  assert(limiter.allowRequest("user1", 500) === false);
   
   // After 1.5 seconds total, should have 1 token
-  console.assert(limiter.allowRequest("user1", 1500) === true);
-  console.assert(limiter.allowRequest("user1", 1500) === false);
+  assert(limiter.allowRequest("user1", 1500) === true);
+  assert(limiter.allowRequest("user1", 1500) === false);
   
   // After 2.5 more seconds (4 seconds total), should have 2 tokens
-  console.assert(limiter.allowRequest("user1", 4000) === true);
-  console.assert(limiter.allowRequest("user1", 4000) === true);
-  console.assert(limiter.allowRequest("user1", 4000) === false);
+  assert(limiter.allowRequest("user1", 4000) === true);
+  assert(limiter.allowRequest("user1", 4000) === true);
+  assert(limiter.allowRequest("user1", 4000) === false);
 });
 
 Deno.test("Token Bucket Rate Limiter - capacity cap", () => {
@@ -88,35 +90,35 @@ Deno.test("Token Bucket Rate Limiter - capacity cap", () => {
   
   // Don't use any tokens for 10 seconds
   // Should still have only 3 tokens (not 20)
-  console.assert(limiter.allowRequest("user1", 10000) === true);
-  console.assert(limiter.allowRequest("user1", 10000) === true);
-  console.assert(limiter.allowRequest("user1", 10000) === true);
-  console.assert(limiter.allowRequest("user1", 10000) === false);
+  assert(limiter.allowRequest("user1", 10000) === true);
+  assert(limiter.allowRequest("user1", 10000) === true);
+  assert(limiter.allowRequest("user1", 10000) === true);
+  assert(limiter.allowRequest("user1", 10000) === false);
 });
 
 Deno.test("Token Bucket Rate Limiter - multiple users", () => {
   const limiter = problem_createTokenBucketRateLimiter(3, 1);
   
   // User 1 uses all tokens
-  console.assert(limiter.allowRequest("user1", 0) === true);
-  console.assert(limiter.allowRequest("user1", 0) === true);
-  console.assert(limiter.allowRequest("user1", 0) === true);
-  console.assert(limiter.allowRequest("user1", 0) === false);
+  assert(limiter.allowRequest("user1", 0) === true);
+  assert(limiter.allowRequest("user1", 0) === true);
+  assert(limiter.allowRequest("user1", 0) === true);
+  assert(limiter.allowRequest("user1", 0) === false);
   
   // User 2 has full bucket
-  console.assert(limiter.allowRequest("user2", 0) === true);
-  console.assert(limiter.allowRequest("user2", 0) === true);
-  console.assert(limiter.allowRequest("user2", 0) === true);
-  console.assert(limiter.allowRequest("user2", 0) === false);
+  assert(limiter.allowRequest("user2", 0) === true);
+  assert(limiter.allowRequest("user2", 0) === true);
+  assert(limiter.allowRequest("user2", 0) === true);
+  assert(limiter.allowRequest("user2", 0) === false);
   
   // After 2 seconds, both users get 2 tokens
-  console.assert(limiter.allowRequest("user1", 2000) === true);
-  console.assert(limiter.allowRequest("user1", 2000) === true);
-  console.assert(limiter.allowRequest("user1", 2000) === false);
+  assert(limiter.allowRequest("user1", 2000) === true);
+  assert(limiter.allowRequest("user1", 2000) === true);
+  assert(limiter.allowRequest("user1", 2000) === false);
   
-  console.assert(limiter.allowRequest("user2", 2000) === true);
-  console.assert(limiter.allowRequest("user2", 2000) === true);
-  console.assert(limiter.allowRequest("user2", 2000) === false);
+  assert(limiter.allowRequest("user2", 2000) === true);
+  assert(limiter.allowRequest("user2", 2000) === true);
+  assert(limiter.allowRequest("user2", 2000) === false);
 });
 
 Deno.test("Token Bucket Rate Limiter - fractional tokens", () => {
@@ -124,19 +126,19 @@ Deno.test("Token Bucket Rate Limiter - fractional tokens", () => {
   
   // Use all tokens
   for (let i = 0; i < 10; i++) {
-    console.assert(limiter.allowRequest("user1", 0) === true);
+    assert(limiter.allowRequest("user1", 0) === true);
   }
   
   // After 1 second, should have 0.5 tokens (not enough)
-  console.assert(limiter.allowRequest("user1", 1000) === false);
+  assert(limiter.allowRequest("user1", 1000) === false);
   
   // After 2 seconds, should have 1 token
-  console.assert(limiter.allowRequest("user1", 2000) === true);
-  console.assert(limiter.allowRequest("user1", 2000) === false);
+  assert(limiter.allowRequest("user1", 2000) === true);
+  assert(limiter.allowRequest("user1", 2000) === false);
   
   // After 10 more seconds (12 total), should have 5 tokens
   for (let i = 0; i < 5; i++) {
-    console.assert(limiter.allowRequest("user1", 12000) === true);
+    assert(limiter.allowRequest("user1", 12000) === true);
   }
-  console.assert(limiter.allowRequest("user1", 12000) === false);
+  assert(limiter.allowRequest("user1", 12000) === false);
 });

@@ -23,5 +23,6 @@
     "JavaScript": {
       "language_servers": ["deno", "!typescript-language-server"]
     }
-  }
+  },
+  "show_completions": false
 }
