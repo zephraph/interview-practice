@@ -33,8 +33,26 @@ function problem_createFixedWindowRateLimiter(
   windowSizeMs: number,
   maxRequests: number,
 ): FixedWindowRateLimiter {
-  // TODO: Implement this function
-  throw new Error("Not implemented");
+  const userWindows = new Map<string, { windowStart: number; count: number }>();
+  
+  return {
+    allowRequest(userId: string, timestamp: number): boolean {
+      const userWindow = userWindows.get(userId);
+      const windowStart = Math.floor(timestamp / windowSizeMs) * windowSizeMs;
+      
+      if (!userWindow || userWindow.windowStart !== windowStart) {
+        userWindows.set(userId, { windowStart, count: 1 });
+        return true;
+      }
+      
+      if (userWindow.count < maxRequests) {
+        userWindow.count++;
+        return true;
+      }
+      
+      return false;
+    },
+  };
 }
 
 // Tests

@@ -38,8 +38,48 @@ function problem_createLeakyBucketRateLimiter(
   bucketCapacity: number,
   leakRatePerSecond: number,
 ): LeakyBucketRateLimiter {
-  // TODO: Implement this function
-  throw new Error("Not implemented");
+  const userLimits = new Map<
+    string,
+    { lastLeakTime: number; queueSize: number }
+  >();
+
+  return {
+    allowRequest(userId, timestamp) {
+      const userLimit = userLimits.get(userId);
+
+      if (!userLimit) {
+        userLimits.set(userId, {
+          lastLeakTime: timestamp,
+          queueSize: 1,
+        });
+        return true;
+      }
+
+      // Calculate time elapsed since last leak processing
+      const timeSinceLastLeak = timestamp - userLimit.lastLeakTime;
+
+      // Calculate how many requests should leak based on time elapsed
+      const requestsToLeak = Math.floor(
+        (timeSinceLastLeak / 1000) * leakRatePerSecond,
+      );
+
+      // Apply the leaks to reduce queue size
+      userLimit.queueSize = Math.max(0, userLimit.queueSize - requestsToLeak);
+
+      // Update lastLeakTime to current timestamp when we leak
+      if (requestsToLeak > 0) {
+        userLimit.lastLeakTime = timestamp;
+      }
+
+      // Check if we can add the new request
+      if (userLimit.queueSize < bucketCapacity) {
+        userLimit.queueSize++;
+        return true;
+      }
+
+      return false;
+    },
+  };
 }
 
 // Tests
